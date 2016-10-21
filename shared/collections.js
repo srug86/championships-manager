@@ -1,2 +1,2 @@
-//Teams = new Mongo.Collection("teams");
-//Championships = new Mongo.Collection("championships");
+Teams = new Mongo.Collection("teams");
+Championships = new Mongo.Collection("championships");

@@ -28,27 +28,49 @@
 </template>
 
 <template name="championship_view">
-    <div class="panel panel-info">
+    <div class="panel panel-success">
         <div class="panel-heading">
-            <h3 class="panel-title">Championship info:</h3>
+            <h3 class="panel-title">{{get_current_championship.name}}</h3>
         </div>
         <div class="panel-body">
-            <table class="table table-striped">
-                <tbody>
-                    <tr>
-                        <td class="col-md-6">Logo:</td>
-                        <td class="col-md-6"><img src="/images/competitions/{{get_current_championship.logo}}.png"></td>
-                    </tr>
-                    <tr>
-                        <td>Name:</td>
-                        <td>{{get_current_championship.name}}</td>
-                    </tr>
-                    <tr>
-                        <td>Short Name:</td>
-                        <td>{{get_current_championship.short_name}}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <ul class="nav nav-pills">
+                <li class="tablinks js-select-info-tab active"><a href="#">Info</a></li>
+                <li class="tablinks js-select-teams-tab"><a href="#">Teams</a></li>
+                <li class="tablinks js-select-knockouts-tab"><a href="#">Knockouts</a></li>
+            </ul>
+            <div id="championship_info" class="tabcontent active">
+                <br>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td class="col-md-6">Logo:</td>
+                            <td class="col-md-6"><img src="/images/competitions/{{get_current_championship.logo}}.png"></td>
+                        </tr>
+                        <tr>
+                            <td>Name:</td>
+                            <td>{{get_current_championship.name}}</td>
+                        </tr>
+                        <tr>
+                            <td>Short Name:</td>
+                            <td>{{get_current_championship.short_name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="championship_teams" class="tabcontent">
+                <br>
+                <div class="panel-body panel-with-scroll">
+                    <div class="list-group">
+                    {{#each get_championship_teams}}
+                        <a href="#" class="list-group-item">{{name}}</a>
+                    {{/each}}
+                    </div>
+                </div>
+            </div>
+            <div id="championship_knockouts" class="tabcontent">
+                <br>
+                <p><i>Here I will show a graphic with the playoffs of {{get_current_championship.name}}.</i></p>
+            </div>
         </div>
     </div>
 </template>

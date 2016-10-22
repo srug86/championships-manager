@@ -1,0 +1,18 @@
+<template name="teams">
+    <div class="container">
+        <h1>Teams</h1>
+        <div class="row">
+            <div class="col-md-6">
+                {{> teams_list}}
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="teams_list">
+    <ul>
+    {{#each get_all_teams}}
+        <li>{{name}}: {{logo}}</li>
+    {{/each}}
+    </ul>
+</template>

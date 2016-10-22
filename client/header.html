@@ -1,19 +1,33 @@
 <template name="header">
-    <div class="navbar navbar-default" role="navigation">
+    <nav class="navbar navbar-inverse">
         <div class="container">
             <div class="navbar-header">
                 <a href="/" class="navbar-brand">Championships Manager</a>
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
+            <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav">
                     <li>
-                        <a href="/">Home</a>
+                        <a href="championships">Championships</a>
                     </li>
                     <li>
+                        <a href="teams">Teams</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
                         <a href="about">About</a>
+                    </li>
+                    <li>
+                        <a>{{> loginButtons}}</a>
                     </li>
                 </ul>
             </div>
         </div>
-    </div>
+    </nav>
 </template>
+

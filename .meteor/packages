@@ -25,3 +25,5 @@ ejson
 iron:router
 session
 spacebars
+accounts-ui
+accounts-password

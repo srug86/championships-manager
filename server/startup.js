@@ -18,9 +18,9 @@ if (Meteor.isServer) {
             }
         }
         // Reset collection
-        else {
-            Teams.remove({});
-        }
+        //else {
+        //    Teams.remove({});
+        //}
         if (!Championships.findOne()) {
             try {
                 var fs = Npm.require('fs');
@@ -39,8 +39,8 @@ if (Meteor.isServer) {
             }
         }
         // Reset collection
-        else {
-            Championships.remove({});
-        }
+        //else {
+        //    Championships.remove({});
+        //}
     })
 }

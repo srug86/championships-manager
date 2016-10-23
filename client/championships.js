@@ -11,7 +11,7 @@ if (Meteor.isClient) {
                 features[ind] = {
                     _id:championship._id,
                     name:championship.name,
-                    logo:championship.logo,
+                    logo:championship.logo
                 };
                 ind++;
             })
@@ -29,15 +29,13 @@ if (Meteor.isClient) {
         
         "get_championship_teams":function(){
             if (Session.get("championshipId") != undefined){
-                var teams = Teams.find({});
+                var championship = Championships.findOne({_id:Session.get("championshipId")});
                 var features = new Array();
                 var ind = 0;
-                teams.forEach(function(team){
-                    features[ind] = {
-                        name:team.name,
-                    };
+                championship.teams.forEach(function(team){
+                    features[ind] = {name:team.name};
                     ind++;
-                })
+                });
                 return features;
             }
             return null;

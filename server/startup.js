@@ -27,12 +27,19 @@ if (Meteor.isServer) {
                 var data = fs.readFileSync('./assets/app/jsonfiles/competitions.json', 'utf8');
                 var competitions = JSON.parse(data);
                 for (var i=0;i<competitions.length; i++) {
-                    Championships.insert(
-                        {
+                    var championship = {
                             name:competitions[i].name,
                             short_name:competitions[i].short_name,
-                            logo:competitions[i].logo
+                            logo:competitions[i].logo,
+                            teams:[]
+                        };
+                    for (var j=0;j<competitions[i].teams.length;j++) {
+                        var team = competitions[i].teams[j];
+                        championship.teams.push({
+                            "name":team.name
                         });
+                    }
+                    Championships.insert(championship);
                 }
             } catch (e) {
                 console.log(e.message);

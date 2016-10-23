@@ -1,5 +1,4 @@
 [
-{"name":"UEFA Euro 2016","short_name":"Euro 2016","logo":"cup_euro"},
-{"name":"FIFA World Cup 2014","short_name":"World Cup 2014","logo":"cup_world"},
-{"name":"Copa America Centenario","short_name":"Copa America","logo":"cup_america"}
-]
+{"name":"UEFA Euro 2016","short_name":"Euro 2016","logo":"cup_euro","teams":[{"name":"Switzerland"},{"name":"Poland"},{"name":"Croatia"},{"name":"Portugal"},{"name":"Wales"},{"name":"Northern Ireland"},{"name":"Hungary"},{"name":"Belgium"},{"name":"Germany"},{"name":"Slovakia"},{"name":"Italy"},{"name":"Spain"},{"name":"France"},{"name":"Republic of Ireland"},{"name":"England"},{"name":"Iceland"}]},
+{"name":"FIFA World Cup 2014","short_name":"World Cup 2014","logo":"cup_world","teams":[{"name":"Brazil"},{"name":"Chile"},{"name":"Colombia"},{"name":"Uruguay"},{"name":"France"},{"name":"Nigeria"},{"name":"Germany"},{"name":"Algeria"},{"name":"Netherlands"},{"name":"Mexico"},{"name":"Costa Rica"},{"name":"Greece"},{"name":"Argentina"},{"name":"Switzerland"},{"name":"Belgium"},{"name":"United States"}]},
+{"name":"Copa America Centenario","short_name":"Copa America","logo":"cup_america","teams":[{"name":"United States"},{"name":"Ecuador"},{"name":"Argentina"},{"name":"Venezuela"},{"name":"Peru"},{"name":"Colombia"},{"name":"Mexico"},{"name":"Chile"}]}]

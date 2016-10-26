@@ -60,7 +60,9 @@ if (Meteor.isClient) {
             return false;
         },
         "click .js-select-knockouts-tab":function(event) {
+            event.preventDefault();
             openTab(event,'championship_knockouts');
+            generateKnockouts();
             return false;
         }
     })
@@ -90,4 +92,49 @@ function openTab(evt, tabName) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
+}
+
+////////////////////////////
+///// function that set up and display the visualisation
+////////////////////////////
+function generateKnockouts() {
+    /*if (visjsobj != undefined){
+        visjsobj.destroy();
+    }
+    var countries = Countries.find({});
+    var ind = 0;
+    var nodes = new Array();
+    var DOM = "flags/";
+    countries.forEach(function(country){
+        console.log(country);
+        nodes[ind] = {
+            id: ind,
+            shape: 'image',
+            image: DOM + country.flag + ".png",
+            value: country[Session.get("feature")],
+            label: country.name,
+        };
+        ind ++ ;
+    });
+    var edges =[
+    ];
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        nodes: {
+            color: {
+                border: '#222222',
+                background: '#666666'
+            },
+            font:{color:'#eeeeee'}
+        },
+        height: '600px'
+    };
+    // get the div from the DOM that we are going to 
+    // put our graph into 
+    var container = document.getElementById('visjs');
+    // create the graph
+    visjsobj = new vis.Network(container, data, options);*/
 }

@@ -7,3 +7,16 @@ body {
     max-height: 300px;
     overflow-y:scroll; 
 }
+
+.img-mini {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+    vertical-align:middle;
+}

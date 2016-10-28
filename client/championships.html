@@ -20,7 +20,11 @@
         <div class="panel-body panel-with-scroll">
             <div class="list-group">
             {{#each get_all_championships}}
-                <a href="#" class="list-group-item js-select-championship">{{name}}</a>
+                <a href="#" class="list-group-item js-select-championship">
+                    <span class="glyphicon glyphicon-{{owner}} glyphicon-little" aria-hidden="true"></span>
+                    <img class="img-mini" src="/images/competitions/{{logo}}.png">
+                    <b>{{name}}</b>
+                </a>
             {{/each}}
             </div>
         </div>
@@ -28,31 +32,32 @@
 </template>
 
 <template name="championship_view">
+    {{#if get_current_championship}}
     <div class="panel panel-success">
         <div class="panel-heading">
             <h3 class="panel-title">{{get_current_championship.name}}</h3>
         </div>
         <div class="panel-body">
             <ul class="nav nav-pills">
-                <li class="tablinks js-select-info-tab active"><a href="#">Info</a></li>
+                <li class="tablinks js-select-info-tab"><a href="#">Info</a></li>
                 <li class="tablinks js-select-teams-tab"><a href="#">Teams</a></li>
-                <li class="tablinks js-select-knockouts-tab"><a href="#">Knockouts</a></li>
+                <li class="tablinks js-select-results-tab"><a href="#">Results</a></li>
             </ul>
-            <div id="championship_info" class="tabcontent active">
+            <div id="championship_info" class="tabcontent">
                 <br>
                 <table class="table table-striped">
                     <tbody>
                         <tr>
-                            <td class="col-md-6">Logo:</td>
-                            <td class="col-md-6"><img src="/images/competitions/{{get_current_championship.logo}}.png"></td>
+                            <td><i>Name:</i></td>
+                            <td><h3>{{get_current_championship.name}}</h3></td>
                         </tr>
                         <tr>
-                            <td>Name:</td>
-                            <td>{{get_current_championship.name}}</td>
+                            <td class="col-md-3"><i>Logo:</i></td>
+                            <td class="col-md-9"><img src="/images/competitions/{{get_current_championship.logo}}.png"></td>
                         </tr>
                         <tr>
-                            <td>Short Name:</td>
-                            <td>{{get_current_championship.short_name}}</td>
+                            <td><i>Short Name:</i></td>
+                            <td><b>{{get_current_championship.short_name}}</b></td>
                         </tr>
                     </tbody>
                 </table>
@@ -62,15 +67,82 @@
                 <div class="panel-body panel-with-scroll">
                     <div class="list-group">
                     {{#each get_championship_teams}}
-                        <a href="#" class="list-group-item">{{name}}</a>
+                        <a href="#" class="list-group-item">
+                            <img class="img-mini" src="/images/teams/{{logo}}.png">
+                            <b>{{name}}</b>
+                        </a>
                     {{/each}}
                     </div>
                 </div>
             </div>
-            <div id="championship_knockouts" class="tabcontent">
+            <div id="championship_results" class="tabcontent">
                 <br>
-                <div id="visjs"></div>
+                {{> knockout_view}}
+                {{> knockout_graph}}
             </div>
+        </div>
+    </div>
+    {{else}}
+    <div class="container">
+        <p><i>Click on a championship to view the championship details...</i></p>
+    </div>
+    {{/if}}
+</template>
+
+<template name="knockout_view">
+    {{#if get_current_match}}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Match result:</h3>
+        </div>
+        <div class="panel-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <td class="col-md-4"><b>Home</b></td>
+                        <td class="col-md-1"></td>
+                        <td class="col-md-2"></td>
+                        <td class="col-md-1"></td>
+                        <td class="col-md-4"><b>Visitors</b></td>
+                    </tr>
+                    <tr>
+                        <td><img src="/images/teams/{{get_current_match.home_kit}}.png"></td>
+                        <td>
+                            <p><h2>{{get_current_match.home_score}}</h2></p>
+                            <p><i>{{get_current_match.home_score_comment}}</i></p>
+                        </td>
+                        <td><strong>vs</strong></td>
+                        <td>
+                            <p><h2>{{get_current_match.away_score}}</h2></p>
+                            <p><i>{{get_current_match.away_score_comment}}</i></p>
+                        </td>
+                        <td><img src="/images/teams/{{get_current_match.away_kit}}.png"></td>
+                    </tr>
+                    <tr>
+                        <td><h3>{{get_current_match.home_team}}</h3></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><h3>{{get_current_match.away_team}}</h3></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{else}}
+    <div class="container">
+        <p><i>Click on a match to view the match details...</i></p>
+    </div>
+    {{/if}}
+</template>
+
+<template name="knockout_graph">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Knockouts:</h3>
+        </div>
+        <div class="panel-body" style="overflow-x:auto;">
+            <div id="visjs"></div>
         </div>
     </div>
 </template>

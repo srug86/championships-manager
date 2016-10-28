@@ -10,6 +10,7 @@ if (Meteor.isClient) {
             championships.forEach(function(championship){
                 features[ind] = {
                     _id:championship._id,
+                    owner:championship.owner == "public" ? "globe" : "user",
                     name:championship.name,
                     logo:championship.logo
                 };
@@ -33,13 +34,22 @@ if (Meteor.isClient) {
                 var features = new Array();
                 var ind = 0;
                 championship.teams.forEach(function(team){
-                    features[ind] = {name:team.name};
+                    features[ind] = {
+                        name:team.name,
+                        logo:team.logo
+                    };
                     ind++;
                 });
                 return features;
             }
             return null;
         }
+    });
+    
+    Template.knockout_view.helpers({
+        "get_current_match":function(){
+            return findCurrentMatch();
+        },
     });
     
     // event functions
@@ -59,9 +69,8 @@ if (Meteor.isClient) {
             openTab(event,'championship_teams');
             return false;
         },
-        "click .js-select-knockouts-tab":function(event) {
-            event.preventDefault();
-            openTab(event,'championship_knockouts');
+        "click .js-select-results-tab":function(event) {
+            openTab(event,'championship_results');
             generateKnockouts();
             return false;
         }
@@ -71,9 +80,28 @@ if (Meteor.isClient) {
 function selectChampionship(event,championship) {
     var championshipId = championship._id;
     Session.set("championshipId",championshipId);
+    Session.set("matchId",undefined);
+    resetTabs();
 }
 
-function openTab(evt, tabName) {
+function findCurrentMatch() {
+    if (Session.get("championshipId") != undefined
+        && Session.get("matchId") != undefined){
+        var matchId = Session.get("matchId");
+        var championship = Championships.findOne({_id:Session.get("championshipId")});
+        var knockouts = Knockouts.findOne({name:championship.name});
+        for (var i=0;i<knockouts.matches.length;i++) {
+            var match_ = knockouts.matches[i];
+            if (match_.round_id == matchId) {
+                return match_;
+            }
+        }
+        return null;
+    }
+    return null;
+}
+
+function resetTabs() {
     // Declare all variables
     var i, tabcontent, tablinks;
 
@@ -88,6 +116,10 @@ function openTab(evt, tabName) {
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
+}
+
+function openTab(evt, tabName) {
+    resetTabs();
 
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(tabName).style.display = "block";
@@ -115,28 +147,20 @@ function generateKnockouts() {
     for (var i=0;i<knockouts.matches.length;i++) {
         var match_ = knockouts.matches[i];
         var homeIndex = nodeIndex;
-        var homeTeamName = match_.home_team;
-        var homeTeam = Teams.findOne({name:homeTeamName});
-        var homeTeamImage = homeTeam == null ? "plain_white_white" : homeTeam.logo;
-        var homeLabel = homeTeamName + ": " + match_.home_score + " " + match_.home_score_comment;
         nodes[homeIndex] = {
             id: match_.round_id + "1",
             shape: 'image',
-            image: DOM + homeTeamImage + ".png",
+            image: DOM + match_.home_kit + ".png",
             value: "10",
-            label: homeLabel
+            label: match_.home_team + ": " + match_.home_score + " " + match_.home_score_comment
         };
         var awayIndex = nodeIndex+1;
-        var awayTeamName = match_.away_team;
-        var awayTeam = Teams.findOne({name:awayTeamName});
-        var awayTeamImage = awayTeam == null ? "plain_red_red" : awayTeam.logo;
-        var awayLabel = awayTeamName + ": " + match_.away_score + " " + match_.away_score_comment;
         nodes[awayIndex] = {
             id: match_.round_id + "2",
             shape: 'image',
-            image: DOM + awayTeamImage + ".png",
+            image: DOM + match_.away_kit + ".png",
             value: "10",
-            label: awayLabel
+            label: match_.away_team + ": " + match_.away_score + " " + match_.away_score_comment
         };
         nodeIndex = nodeIndex+2;
         knockoutIndex++;
@@ -195,7 +219,13 @@ function generateKnockouts() {
     var options = {
         interaction: {dragNodes :false},
         manipulation: {enabled:false},
-        physics: {enabled: false},
+        physics: {
+            enabled: false,
+            stabilization: { 
+                enabled: false,
+                iterations: 1
+            }
+        },
         layout: {
             hierarchical: {
                 enabled:true,
@@ -210,4 +240,13 @@ function generateKnockouts() {
     var container = document.getElementById('visjs');
     // create the graph
     visjsobj = new vis.Network(container, data, options);
+    
+    // vis events
+    visjsobj.on("click", function (params) {
+        var teamMatchId = params.nodes[0];
+        if (teamMatchId != undefined) {
+            var matchId = teamMatchId.substring(0,teamMatchId.length-1);
+            Session.set("matchId",matchId);
+        }
+    });
 }

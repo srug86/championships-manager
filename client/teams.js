@@ -9,6 +9,7 @@ if (Meteor.isClient) {
             teams.forEach(function(team){
                 features[ind] = {
                     _id:team._id,
+                    owner:team.owner == "public" ? "globe" : "user",
                     name:team.name,
                     logo:team.logo,
                 };

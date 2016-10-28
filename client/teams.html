@@ -20,7 +20,11 @@
         <div class="panel-body panel-with-scroll">
             <div class="list-group">
             {{#each get_all_teams}}
-                <a href="#" class="list-group-item js-select-team">{{name}}</a>
+                <a href="#" class="list-group-item js-select-team">
+                    <span class="glyphicon glyphicon-{{owner}} glyphicon-little" aria-hidden="true"></span>
+                    <img class="img-mini" src="/images/teams/{{logo}}.png">
+                    <b>{{name}}</b>
+                </a>
             {{/each}}
             </div>
         </div>
@@ -28,6 +32,7 @@
 </template>
 
 <template name="team_view">
+    {{#if get_current_team}}
     <div class="panel panel-info">
         <div class="panel-heading">
             <h3 class="panel-title">Team info:</h3>
@@ -36,19 +41,24 @@
             <table class="table table-striped">
                 <tbody>
                     <tr>
-                        <td class="col-md-6">Shirt:</td>
-                        <td class="col-md-6"><img src="/images/teams/{{get_current_team.logo}}.png"></td>
+                        <td><i>Name:</i></td>
+                        <td><h3>{{get_current_team.name}}</h3></td>
                     </tr>
                     <tr>
-                        <td>Name:</td>
-                        <td>{{get_current_team.name}}</td>
+                        <td class="col-md-3"><i>Shirt:</i></td>
+                        <td class="col-md-9"><img src="/images/teams/{{get_current_team.logo}}.png"></td>
                     </tr>
                     <tr>
-                        <td>Short Name:</td>
-                        <td>{{get_current_team.short_name}}</td>
+                        <td><i>Short Name:</i></td>
+                        <td><b>{{get_current_team.short_name}}</b></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
+    {{else}}
+    <div class="container">
+        <p><i>Click on a team to view the team details...</i></p>
+    </div>
+    {{/if}}
 </template>

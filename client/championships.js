@@ -98,37 +98,110 @@ function openTab(evt, tabName) {
 ///// function that set up and display the visualisation
 ////////////////////////////
 function generateKnockouts() {
-    /*if (visjsobj != undefined){
+    if (visjsobj != undefined){
         visjsobj.destroy();
     }
-    var countries = Countries.find({});
-    var ind = 0;
+    if (Session.get("championshipId") == undefined){
+        return;
+    }
+    var championship = Championships.findOne({_id:Session.get("championshipId")});
+    var championshipName = championship.name;
+    console.log(championshipName);
+    var knockouts = Knockouts.findOne({name:championshipName});
+    var nodeIndex = 0;
+    var knockoutIndex = 0;
     var nodes = new Array();
-    var DOM = "flags/";
-    countries.forEach(function(country){
-        console.log(country);
-        nodes[ind] = {
-            id: ind,
+    var DOM = "/images/teams/";
+    for (var i=0;i<knockouts.matches.length;i++) {
+        var match_ = knockouts.matches[i];
+        var homeIndex = nodeIndex;
+        var homeTeamName = match_.home_team;
+        var homeTeam = Teams.findOne({name:homeTeamName});
+        var homeTeamImage = homeTeam == null ? "plain_white_white" : homeTeam.logo;
+        var homeLabel = homeTeamName + ": " + match_.home_score + " " + match_.home_score_comment;
+        nodes[homeIndex] = {
+            id: match_.round_id + "1",
             shape: 'image',
-            image: DOM + country.flag + ".png",
-            value: country[Session.get("feature")],
-            label: country.name,
+            image: DOM + homeTeamImage + ".png",
+            value: "10",
+            label: homeLabel
         };
-        ind ++ ;
-    });
-    var edges =[
-    ];
+        var awayIndex = nodeIndex+1;
+        var awayTeamName = match_.away_team;
+        var awayTeam = Teams.findOne({name:awayTeamName});
+        var awayTeamImage = awayTeam == null ? "plain_red_red" : awayTeam.logo;
+        var awayLabel = awayTeamName + ": " + match_.away_score + " " + match_.away_score_comment;
+        nodes[awayIndex] = {
+            id: match_.round_id + "2",
+            shape: 'image',
+            image: DOM + awayTeamImage + ".png",
+            value: "10",
+            label: awayLabel
+        };
+        nodeIndex = nodeIndex+2;
+        knockoutIndex++;
+    }
+    nodes[nodeIndex] = {
+        id: "0",
+        shape: 'image',
+        image: "/images/competitions/" + championship.logo + ".png",
+        value: "10",
+        label: championshipName
+    };
+    var matchIndex = 0;
+    var edges = new Array();
+    var longestId = "";
+    for (var i=0;i<nodes.length-1;i++) {
+        var teamMatchId = nodes[i].id;
+        var matchId = teamMatchId.substring(0,teamMatchId.length-1);
+        var teamId = teamMatchId.substring(teamMatchId.length-1,teamMatchId.length);
+        if (matchId.length > 1 && teamId == "1") {
+            var prevMatchId1 = matchId.substring(0,matchId.length/2);
+            edges[matchIndex] = {
+                from:prevMatchId1 + "1",
+                to:matchId + "1"
+            };
+            edges[matchIndex+1] = {
+                from:prevMatchId1 + "2",
+                to:matchId + "1"
+            };
+            var prevMatchId2 = matchId.substring(matchId.length/2,matchId.length);
+            edges[matchIndex+2] = {
+                from:prevMatchId2 + "1",
+                to:matchId + "2"
+            };
+            edges[matchIndex+3] = {
+                from:prevMatchId2 + "2",
+                to:matchId + "2"
+            };
+            matchIndex=matchIndex+4;
+        }
+        if (longestId.length <= matchId.length) {
+            longestId = matchId;
+        }
+    }
+    edges[matchIndex] = {
+        from:longestId + "1",
+        to:"0"
+    };
+    edges[matchIndex+1] = {
+        from:longestId + "2",
+        to:"0"
+    };
     var data = {
         nodes: nodes,
         edges: edges
     };
     var options = {
-        nodes: {
-            color: {
-                border: '#222222',
-                background: '#666666'
-            },
-            font:{color:'#eeeeee'}
+        interaction: {dragNodes :false},
+        manipulation: {enabled:false},
+        physics: {enabled: false},
+        layout: {
+            hierarchical: {
+                enabled:true,
+                direction: 'RL',
+                sortMethod: 'directed'
+            }
         },
         height: '600px'
     };
@@ -136,5 +209,5 @@ function generateKnockouts() {
     // put our graph into 
     var container = document.getElementById('visjs');
     // create the graph
-    visjsobj = new vis.Network(container, data, options);*/
+    visjsobj = new vis.Network(container, data, options);
 }

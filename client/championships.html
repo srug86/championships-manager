@@ -1,9 +1,15 @@
 <template name="championships">
     <div class="container">
+        {{#if currentUser}}
+        <p>Signed in as <strong><i>{{get_user_name}}</i></strong></p>
+        {{/if}}
         <h1>Championships</h1>
         <div class="row">
             <div class="col-md-4">
                 {{> championships_list}}
+                {{#if currentUser}}
+                    {{> add_championship_form}}
+                {{/if}}
             </div>
             <div class="col-md-8">
                 {{> championship_view}}
@@ -143,6 +149,32 @@
         </div>
         <div class="panel-body" style="overflow-x:auto;">
             <div id="visjs"></div>
+        </div>
+    </div>
+</template>
+
+<template name="add_championship_form">
+    <a class="btn btn-primary js-toggle-championship-form" href="#">
+        Add Championship
+    </a>
+    <div id="championship_form" class="hidden_div">
+        <div class="container container-float">
+            <form class="js-save-championship-form">
+                <div class="form-group">
+                    <label for="url">Site address</label>
+                    <input type="text" class="form-control" id="url" placeholder="http://www.mysite.com">
+                </div>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" placeholder="Mysite">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="description" placeholder="I found this site really useful for ...">
+                </div>
+
+                <button type="submit" class="btn btn-success">Create</button>
+            </form>
         </div>
     </div>
 </template>

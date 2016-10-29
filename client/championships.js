@@ -2,6 +2,12 @@ var visjsobj;
 if (Meteor.isClient) {
     
     // helper functions
+    Template.championships.helpers({
+        "get_user_name":function(){
+            return getUserName();
+        }
+    });
+    
     Template.championships_list.helpers({
         "get_all_championships":function(){
             var championships = Championships.find({});
@@ -17,6 +23,21 @@ if (Meteor.isClient) {
                 ind++;
             })
             return features;
+        }
+    });
+    
+    Template.add_championship_form.events({
+        "click .js-toggle-championship-form":function(event){
+            $("#championship_form").toggle('slow');
+        },  
+        "submit .js-save-championship-form":function(event){
+            var url = event.target.url.value;
+            var title = event.target.title.value;
+            var description = event.target.description.value;
+            if (Meteor.user()){
+                console.log("success");
+            }
+            return false;
         }
     });
     
@@ -75,6 +96,13 @@ if (Meteor.isClient) {
             return false;
         }
     })
+}
+
+function getUserName() {
+    if (Meteor.user() != undefined) {
+        return Meteor.user().emails[0].address;
+    }
+    return undefined;
 }
 
 function selectChampionship(event,championship) {

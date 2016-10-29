@@ -3,6 +3,12 @@ body {
     background-repeat: repeat;
 }
 
+th, td {
+    padding: 15px;
+    text-align: center;
+    vertical-align:middle;
+}
+
 .panel-with-scroll {
     max-height: 300px;
     overflow-y:scroll; 
@@ -15,8 +21,8 @@ body {
     margin-right: 5px;
 }
 
-th, td {
-    padding: 15px;
-    text-align: center;
-    vertical-align:middle;
+.container-float{
+    padding-top:20px;
+    padding-bottom:20px;
+    background-color:WhiteSmoke;
 }

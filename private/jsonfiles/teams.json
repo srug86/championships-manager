@@ -29,5 +29,9 @@
 {"name":"United States","short_name":"USA","logo":"plain_white_blue"},
 {"name":"Ecuador","short_name":"Ecuador","logo":"plain_yellow_blue"},
 {"name":"Venezuela","short_name":"Venezuela","logo":"plain_red_yellow"},
-{"name":"Peru","short_name":"Peru","logo":"plain_white_red"}
+{"name":"Peru","short_name":"Peru","logo":"plain_white_red"},
+{"name":"Iran","short_name":"Iran","logo":"plain_white_white"},
+{"name":"Japan","short_name":"Japan","logo":"plain_blue_red"},
+{"name":"Korea Republic","short_name":"South Korea","logo":"plain_red_blue"},
+{"name":"Australia","short_name":"Australia","logo":"plain_yellow_green"}
 ]

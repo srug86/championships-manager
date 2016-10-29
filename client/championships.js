@@ -1,6 +1,5 @@
 var visjsobj;
 if (Meteor.isClient) {
-    
     // helper functions
     Template.championships.helpers({
         "get_user_name":function(){
@@ -10,34 +9,43 @@ if (Meteor.isClient) {
     
     Template.championships_list.helpers({
         "get_all_championships":function(){
+            var userName = getUserName();
             var championships = Championships.find({});
             var features = new Array();
             var ind = 0;
             championships.forEach(function(championship){
-                features[ind] = {
-                    _id:championship._id,
-                    owner:championship.owner == "public" ? "globe" : "user",
-                    name:championship.name,
-                    logo:championship.logo
-                };
-                ind++;
+                var owner = championship.owner;
+                if (owner == "public" || userName != undefined) {
+                    features[ind] = {
+                        _id:championship._id,
+                        owner:owner == "public" ? "globe" : "user",
+                        name:championship.name,
+                        logo:championship.logo
+                    };
+                    ind++;
+                }
             })
             return features;
         }
     });
     
-    Template.add_championship_form.events({
-        "click .js-toggle-championship-form":function(event){
-            $("#championship_form").toggle('slow');
-        },  
-        "submit .js-save-championship-form":function(event){
-            var url = event.target.url.value;
-            var title = event.target.title.value;
-            var description = event.target.description.value;
-            if (Meteor.user()){
-                console.log("success");
-            }
-            return false;
+    Template.add_championship_form.helpers({
+        "get_all_teams":function() {
+            var userName = getUserName();
+            var userChampionshipTeams = NewChampionshipTeams.findOne({owner:userName});
+            return userChampionshipTeams.teams;
+        },
+        
+        "get_selected_teams":function() {
+            return getSelectedTeams();
+        },
+        
+        "get_number_of_teams":function() {
+            return Teams.find({}).count();
+        },
+        
+        "get_number_of_selected_teams":function() {
+            return getNumberOfSelectedTeams();
         }
     });
     
@@ -81,6 +89,37 @@ if (Meteor.isClient) {
         }
     });
     
+    Template.add_championship_form.events({
+        "click .js-toggle-championship-form":function(event){
+            $("#championship_form").toggle('slow');
+            initializeNewChampionshipTeams();
+        },
+        
+        "submit .js-save-championship-form":function(event){
+            event.preventDefault();
+            var name = event.target.name.value;
+            var shortName = event.target.short_name.value;
+            var logo = event.target.logo.value;
+            var numberOfTeams = event.target.number_of_teams.value;
+            if (name != "" && shortName != ""){
+                var championship = insertChampionship(name,shortName,logo,numberOfTeams);
+                if (championship != undefined) {
+                    initializeKnockouts(championship);
+                }
+            } else {
+                // TODO
+                console.log("invalid data");
+            }
+            return false;
+        },
+        
+        "click .js-team-check":function(event) {
+            var team = event.target.id;
+            var isChecked = event.target.checked;
+            updateChampionshipTeams(team,isChecked);
+        }
+    });
+    
     Template.championship_view.events({
         "click .js-select-info-tab":function(event) {
             openTab(event,'championship_info');
@@ -95,7 +134,7 @@ if (Meteor.isClient) {
             generateKnockouts();
             return false;
         }
-    })
+    });
 }
 
 function getUserName() {
@@ -105,11 +144,128 @@ function getUserName() {
     return undefined;
 }
 
+function getNumberOfSelectedTeams() {
+    var userName = getUserName();
+    var userChampionshipTeams = NewChampionshipTeams.findOne({owner:userName});
+    var counter = 0;
+    userChampionshipTeams.teams.forEach(function(team){
+        if (team.selected == true) {
+            counter++;
+        }
+    });
+    return counter;
+}
+
+function getSelectedTeams() {
+    var userName = getUserName();
+    var userChampionshipTeams = NewChampionshipTeams.findOne({owner:userName});
+    var features = new Array();
+    var ind = 0;
+    userChampionshipTeams.teams.forEach(function(team){
+        if (team.selected == true) {
+            features[ind] = {
+                name:team.name,
+                logo:team.logo,
+            };
+            ind++;
+        }
+    });
+    return features;
+}
+
 function selectChampionship(event,championship) {
     var championshipId = championship._id;
     Session.set("championshipId",championshipId);
     Session.set("matchId",undefined);
     resetTabs();
+}
+
+function insertChampionship(name,shortName,logo,numberOfTeams) {
+    var userName = getUserName();
+    var championshipTeams = getSelectedTeams();
+    if (championshipTeams.length == numberOfTeams) {
+        var championship = Championships.findOne({name:name});
+        if (championship == undefined) {
+            championship = {
+                owner:userName,
+                name:name,
+                short_name:shortName,
+                logo:logo,
+                teams:[]
+            };
+            for (var i=0;i<championshipTeams.length;i++) {
+                var team = championshipTeams[i];
+                championship.teams.push({
+                    "name":team.name,
+                    "logo":team.logo
+                });
+            }
+            Championships.insert(championship);
+            return championship;
+        } else {
+            console.log("already exists");
+            // TODO
+        }
+    } else {
+        console.log("incorrect number of teams");
+        // TODO
+    }
+    return undefined;
+}
+
+function initializeKnockouts(championship) {
+    var userName = getUserName();
+    var knockouts = {
+        name:championship.name,
+        matches:[]
+    };
+    var roundIdLength=1;
+    var roundMatches=[];
+    var numberOfMatches=championship.teams.length-1;
+    var numberOfRoundMatches=championship.teams.length/2;
+    var matchIds = "ABCDEFGHIJKLMNOP";
+    var teamIndex=0;
+    for (var i=0;i<numberOfRoundMatches;i++) {
+        var roundId=matchIds.substr(i,roundIdLength);
+        var homeTeam=championship.teams[teamIndex];
+        var awayTeam=championship.teams[teamIndex+1];
+        var roundMatch = {
+            "round_id":roundId,
+            "home_team":homeTeam.name,
+            "home_kit":homeTeam.logo,
+            "home_score":0,
+            "home_score_comment":"",
+            "away_team":awayTeam.name,
+            "away_kit":awayTeam.logo,
+            "away_score":0,
+            "away_score_comment":""
+        };
+        roundMatches.push(roundMatch);
+        knockouts.matches.push(roundMatch);
+        teamIndex=teamIndex+2;
+    }
+    while(numberOfRoundMatches > 1) {
+        roundIdLength=roundIdLength*2;
+        numberOfRoundMatches=roundMatches.length/2;
+        roundMatches=[];
+        for (var i=0;i<numberOfRoundMatches;i++) {
+            var roundId=matchIds.substr(i*roundIdLength,roundIdLength);
+            var roundMatch = {
+                "round_id":roundId,
+                "home_team":"",
+                "home_kit":"ball",
+                "home_score":0,
+                "home_score_comment":"",
+                "away_team":"",
+                "away_kit":"ball",
+                "away_score":0,
+                "away_score_comment":""
+            };
+            roundMatches.push(roundMatch);
+            knockouts.matches.push(roundMatch);
+        }
+    }
+    Knockouts.insert(knockouts);
 }
 
 function findCurrentMatch() {
@@ -152,6 +308,48 @@ function openTab(evt, tabName) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
+}
+
+function initializeNewChampionshipTeams() {
+    var userName = getUserName();
+    var userChampionshipTeams = NewChampionshipTeams.findOne({owner:userName});
+    if (userChampionshipTeams) {
+        NewChampionshipTeams.remove({_id:userChampionshipTeams._id});
+    }
+    var championshipTeams = {
+        "owner":userName,
+        "teams":[]
+    };
+    var teams = Teams.find({});
+    teams.forEach(function(team){
+        championshipTeams.teams.push({
+            _id:team._id,
+            "selected":false,
+            "name":team.name,
+            "logo":team.logo
+        });
+    });
+    NewChampionshipTeams.insert(championshipTeams);
+}
+
+function updateChampionshipTeams(teamName,isChecked) {
+    var userName = getUserName();
+    var championshipTeams = NewChampionshipTeams.findOne({owner:userName});
+    if (championshipTeams != undefined) {
+        var ind = 0;
+        var teams = new Array();
+        championshipTeams.teams.forEach(function(championshipTeam){
+            var selected = championshipTeam.name == teamName ? isChecked : championshipTeam.selected;
+            teams[ind] = {
+                "_id":championshipTeam._id,
+                "selected":selected,
+                "name":championshipTeam.name,
+                "logo":championshipTeam.logo
+            };
+            ind++;
+        });
+        NewChampionshipTeams.update({_id:championshipTeams._id},{$set:{"teams":teams}});
+    }
 }
 
 ////////////////////////////

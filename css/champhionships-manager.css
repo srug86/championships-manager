@@ -26,3 +26,11 @@ th, td {
     padding-bottom:20px;
     background-color:WhiteSmoke;
 }
+
+.align-content-left {
+    align-content: left;
+}
+
+.align-content-right {
+    align-content: right;
+}

@@ -58,20 +58,7 @@ if (Meteor.isClient) {
         },
         
         "get_championship_teams":function(){
-            if (Session.get("championshipId") != undefined){
-                var championship = Championships.findOne({_id:Session.get("championshipId")});
-                var features = new Array();
-                var ind = 0;
-                championship.teams.forEach(function(team){
-                    features[ind] = {
-                        name:team.name,
-                        logo:team.logo
-                    };
-                    ind++;
-                });
-                return features;
-            }
-            return null;
+            return getChampionshipTeams();
         }
     });
     
@@ -79,6 +66,32 @@ if (Meteor.isClient) {
         "get_current_match":function(){
             return findCurrentMatch();
         },
+        
+        "is_user_the_owner":function(){
+            var user = getUserName();
+            var championshipId = Session.get("championshipId");
+            if (user != undefined && championshipId != undefined) {
+                var championship = Championships.findOne({_id:championshipId});
+                return championship.owner == user;
+            }
+            return false;
+        }
+    });
+    
+    Template.update_knockout_form.helpers({
+        "get_selectable_teams":function(){
+            var selectableTeams = getChampionshipTeams();
+            console.log(selectableTeams);
+            if (selectableTeams != null) {
+                var index = selectableTeams.length;
+                selectableTeams[index] = {
+                    name:"---",
+                    logo:"ball"
+                };
+                return selectableTeams;
+            }
+            return null;
+        }
     });
     
     // event functions
@@ -135,6 +148,34 @@ if (Meteor.isClient) {
             return false;
         }
     });
+    
+    Template.update_knockout_form.events({
+        "click .js-toggle-match-form":function(event){
+            $("#match_form").toggle('slow');
+        },
+        
+        "submit .js-save-match-form":function(event){
+            event.preventDefault();
+            var homeName = event.target.home_team.value;
+            var homeResult = event.target.home_result.value;
+            homeResult = homeResult == "" ? 0 : homeResult;
+            var homeResultComment = event.target.home_result_comment.value;
+            var awayName = event.target.away_team.value;
+            var awayResult = event.target.away_result.value;
+            awayResult = awayResult == "" ? 0 : awayResult;
+            var awayResultComment = event.target.away_result_comment.value;
+            if (homeName != awayName || homeName == "---"){
+                var success = updateMatch(homeName,homeResult,homeResultComment,awayName,awayResult,awayResultComment);
+                if (success) {
+                    generateKnockouts();
+                }
+            } else {
+                // TODO
+                console.log("the home team must be different to the away team.");
+            }
+            return false;
+        },
+    });
 }
 
 function getUserName() {
@@ -171,6 +212,23 @@ function getSelectedTeams() {
         }
     });
     return features;
+}
+
+function getChampionshipTeams() {
+    if (Session.get("championshipId") != undefined){
+        var championship = Championships.findOne({_id:Session.get("championshipId")});
+        var features = new Array();
+        var ind = 0;
+        championship.teams.forEach(function(team){
+            features[ind] = {
+                name:team.name,
+                logo:team.logo
+            };
+            ind++;
+        });
+        return features;
+    }
+    return null;
 }
 
 function selectChampionship(event,championship) {
@@ -308,6 +366,55 @@ function openTab(evt, tabName) {
     // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
+}
+
+function updateMatch(homeName,homeResult,homeResultComment,awayName,awayResult,awayResultComment) {
+    if (Session.get("championshipId") != undefined
+        && Session.get("matchId") != undefined){
+        var matchId = Session.get("matchId");
+        var championship = Championships.findOne({_id:Session.get("championshipId")});
+        var knockouts = Knockouts.findOne({name:championship.name});
+        var ind = 0;
+        var matches = new Array();
+        knockouts.matches.forEach(function(match_){
+            var isUpdated = matchId == match_.round_id;
+            var hName = isUpdated ? homeName : match_.home_team;
+            var hResult = isUpdated ? homeResult : match_.home_score;
+            var hResultComment = isUpdated ? homeResultComment : match_.home_score_comment;
+            var hLogo = getTeamLogo(hName);
+            var aName = isUpdated ? awayName : match_.away_team;
+            var aResult = isUpdated ? awayResult : match_.away_score;
+            var aResultComment = isUpdated ? awayResultComment : match_.away_score_comment;
+            var aLogo = getTeamLogo(aName);
+            matches[ind] = {
+                "round_id":match_.round_id,
+                "home_team":hName,
+                "home_kit":hLogo,
+                "home_score":hResult,
+                "home_score_comment":hResultComment,
+                "away_team":aName,
+                "away_kit":aLogo,
+                "away_score":aResult,
+                "away_score_comment":aResultComment
+            };
+            ind++;
+        });
+        Knockouts.update({_id:knockouts._id},{$set:{"matches":matches}});
+        return true;
+    }
+    return false;
+}
+
+function getTeamLogo(teamName) {
+    if (teamName == "---" || teamName == "") {
+        return "ball";
+    } else {
+        var team = Teams.findOne({name:teamName});
+        if (team != undefined) {
+            return team.logo;
+        }
+        return "";
+    }
 }
 
 function initializeNewChampionshipTeams() {

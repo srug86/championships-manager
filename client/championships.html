@@ -65,6 +65,12 @@
                             <td><i>Short Name:</i></td>
                             <td><b>{{get_current_championship.short_name}}</b></td>
                         </tr>
+                        {{#if currentUser}}
+                        <tr>
+                            <td><i>Owner:</i></td>
+                            <td><i>{{get_current_championship.owner}}</i></td>
+                        </tr>
+                        {{/if}}
                     </tbody>
                 </table>
             </div>
@@ -133,6 +139,9 @@
                     </tr>
                 </tbody>
             </table>
+            {{#if is_user_the_owner}}
+                {{> update_knockout_form}}
+            {{/if}}
         </div>
     </div>
     {{else}}
@@ -140,6 +149,53 @@
         <p><i>Click on a match to view the match details...</i></p>
     </div>
     {{/if}}
+</template>
+
+<template name="update_knockout_form">
+    <a class="btn btn-primary js-toggle-match-form" href="#">
+        Update Match
+    </a>
+    <div id="match_form" class="hidden_div">
+        <form class="js-save-match-form">
+            <div class="form-group">
+                <label for="home_team">Home team</label>
+                <div class="input-group"> 
+                    <select id="home_team" class="selectpicker form-control" data-live-search="true">
+                        {{#each get_selectable_teams}}
+                            <option>{{name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="home_result">Home team result</label>
+                <input type="text" class="form-control" id="home_result" placeholder="type the home team result...">
+            </div>
+            <div class="form-group">
+                <label for="home_result_comment">Home team result comment</label>
+                <input type="text" class="form-control" id="home_result_comment" placeholder="type a comment for the home team result...">
+            </div>
+            <div class="form-group">
+                <label for="away_team">Away team</label>
+                <div class="input-group"> 
+                    <select id="away_team" class="selectpicker form-control" data-live-search="true">
+                        {{#each get_selectable_teams}}
+                            <option>{{name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="away_result">Away team result</label>
+                <input type="text" class="form-control" id="away_result" placeholder="type the away team result...">
+            </div>
+            <div class="form-group">
+                <label for="away_result_comment">Away team result comment</label>
+                <input type="text" class="form-control" id="away_result_comment" placeholder="type a comment for the away team result...">
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+        </form>
+    </div>
 </template>
 
 <template name="knockout_graph">
@@ -157,80 +213,78 @@
     <a class="btn btn-primary js-toggle-championship-form" href="#">
         Add Championship
     </a>
-    <div id="championship_form" class="hidden_div">
-        <div class="container container-float">
-            <form class="js-save-championship-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" placeholder="type the name of the championship...">
-                </div>
-                <div class="form-group">
-                    <label for="short_name">Short Name</label>
-                    <input type="text" class="form-control" id="short_name" placeholder="type the reduced version name of the championship...">
-                </div>
-                <div class="form-group">
-                    <label for="logo">Logo</label>
-                    <div class="input-group"> 
-                        <select id="logo" class="selectpicker form-control" data-live-search="true">
-                            <option>cup_americana</option>
-                            <option>cup_euro</option>
-                            <option>cup_world</option>
-                            <option>cup_a</option>
-                            <option>cup_b</option>
-                            <option>cup_c</option>
-                            <option>cup_d</option>
-                            <option>cup_e</option>
-                            <option>cup_f</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="number_of_teams">Number of teams</label>
-                    <div class="input-group"> 
-                        <select id="number_of_teams" class="selectpicker form-control" data-live-search="true">
-                            <option>2</option>
-                            <option>4</option>
-                            <option>8</option>
-                            <option>16</option>
-                            <option>32</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="teams">Teams ({{get_number_of_teams}})</label>
-                            <div class="panel-body panel-with-scroll">
-                                <div class="input-group"> 
-                                    {{#each get_all_teams}}
-                                        <div class="list-group-item">
-                                            <input type='checkbox' id="{{name}}" class="js-team-check">
-                                            <img class="img-mini" src="/images/teams/{{logo}}.png">
-                                            <b>{{name}}</b>
-                                        </div>
-                                    {{/each}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="teams">Selected Teams ({{get_number_of_selected_teams}})</label>
-                            <div class="panel-body panel-with-scroll">
-                                <div class="input-group"> 
-                                    {{#each get_selected_teams}}
-                                        <div class="list-group-item">
-                                            <img class="img-mini" src="/images/teams/{{logo}}.png">
-                                            <b>{{name}}</b>
-                                        </div>
-                                    {{/each}}
-                                </div>
-                            </div>
+    <div id="championship_form" class="hidden_div container-float">
+        <form class="js-save-championship-form">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" placeholder="type the name of the championship...">
+            </div>
+            <div class="form-group">
+                <label for="short_name">Short Name</label>
+                <input type="text" class="form-control" id="short_name" placeholder="type the short name of the championship...">
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="number_of_teams">Number of teams</label>
+                        <div class="input-group"> 
+                            <select id="number_of_teams" class="selectpicker form-control" data-live-search="true">
+                                <option>2</option>
+                                <option>4</option>
+                                <option>8</option>
+                                <option>16</option>
+                                <option>32</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success">Create</button>
-            </form>
-        </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="logo">Logo</label>
+                        <div class="input-group"> 
+                            <select id="logo" class="selectpicker form-control" data-live-search="true">
+                                <option>cup_americana</option>
+                                <option>cup_euro</option>
+                                <option>cup_world</option>
+                                <option>cup_a</option>
+                                <option>cup_b</option>
+                                <option>cup_c</option>
+                                <option>cup_d</option>
+                                <option>cup_e</option>
+                                <option>cup_f</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="teams">Teams ({{get_number_of_teams}})</label>
+                <div class="panel-body panel-with-scroll">
+                    <div class="input-group"> 
+                        {{#each get_all_teams}}
+                            <div class="list-group-item">
+                                <input type='checkbox' id="{{name}}" class="js-team-check">
+                                <img class="img-mini" src="/images/teams/{{logo}}.png">
+                                <b>{{name}}</b>
+                            </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="teams">Selected Teams ({{get_number_of_selected_teams}})</label>
+                <div class="panel-body panel-with-scroll">
+                    <div class="input-group"> 
+                        {{#each get_selected_teams}}
+                            <div class="list-group-item">
+                                <img class="img-mini" src="/images/teams/{{logo}}.png">
+                                <b>{{name}}</b>
+                            </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Create</button>
+        </form>
     </div>
 </template>

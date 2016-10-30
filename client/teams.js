@@ -61,10 +61,10 @@ if (Meteor.isClient) {
                 if (!Teams.findOne({name:name})) {
                     insertTeam(name,shortName,logo);
                 } else {
-                    // TODO
+                    window.alert("A team already exists with the same name.");
                 }
             } else {
-                // TODO
+                window.alert("'Name' and 'Short Name' mustn't be empty");
             }
             return false;
         }
@@ -93,7 +93,5 @@ function insertTeam(teamName,teamShortName,teamLogo) {
                 short_name:teamShortName,
                 logo:teamLogo
             });
-        console.log("the team was inserted: ");
-        console.log(teamName);
     }
 }

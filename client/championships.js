@@ -81,7 +81,6 @@ if (Meteor.isClient) {
     Template.update_knockout_form.helpers({
         "get_selectable_teams":function(){
             var selectableTeams = getChampionshipTeams();
-            console.log(selectableTeams);
             if (selectableTeams != null) {
                 var index = selectableTeams.length;
                 selectableTeams[index] = {
@@ -120,8 +119,7 @@ if (Meteor.isClient) {
                     initializeKnockouts(championship);
                 }
             } else {
-                // TODO
-                console.log("invalid data");
+                window.alert("'Name' and 'Short Name' mustn't be empty");
             }
             return false;
         },
@@ -170,8 +168,7 @@ if (Meteor.isClient) {
                     generateKnockouts();
                 }
             } else {
-                // TODO
-                console.log("the home team must be different to the away team.");
+                window.alert("The 'Home Team' must be different to the 'Away Team'.");
             }
             return false;
         },
@@ -261,12 +258,10 @@ function insertChampionship(name,shortName,logo,numberOfTeams) {
             Championships.insert(championship);
             return championship;
         } else {
-            console.log("already exists");
-            // TODO
+            window.alert("A championship already exists with the same name.");
         }
     } else {
-        console.log("incorrect number of teams");
-        // TODO
+        window.alert("'Number of teams' doesn't match with the number of 'Selected Teams.'");
     }
     return undefined;
 }
@@ -471,7 +466,6 @@ function generateKnockouts() {
     }
     var championship = Championships.findOne({_id:Session.get("championshipId")});
     var championshipName = championship.name;
-    console.log(championshipName);
     var knockouts = Knockouts.findOne({name:championshipName});
     var nodeIndex = 0;
     var knockoutIndex = 0;

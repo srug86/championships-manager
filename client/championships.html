@@ -2,6 +2,8 @@
     <div class="container">
         {{#if currentUser}}
         <p>Signed in as <strong><i>{{get_user_name}}</i></strong></p>
+        {{else}}
+        <p><i>Sign in now to have a full experience...</i></p>
         {{/if}}
         <h1>Championships</h1>
         <div class="row">
